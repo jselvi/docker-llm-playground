@@ -1,0 +1,39 @@
+services:
+  pt-playground-ollama:
+    image: ollama/ollama
+    container_name: pt-playground-ollama
+    volumes:
+      - ./data/ollama:/root/.ollama
+    environment:
+      # https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately
+      - 'OLLAMA_KEEP_ALIVE=-1'
+    restart: unless-stopped
+
+  pt-playground-open-webui-pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pt-playground-open-webui-pipelines
+    volumes:
+      - ./pipelines:/app/PIPELINES_API_KEY
+    environment:
+      - 'PIPELINES_API_KEY="0p3n-w3bu!"'  # Default password
+    restart: unless-stopped
+
+  pt-playground-open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: pt-playground-open-webui
+    depends_on:
+      - pt-playground-ollama
+      - pt-playground-open-webui-pipelines
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./data/open-webui:/app/backend/data
+    environment:
+      # https://docs.openwebui.com/getting-started/env-configuration/
+      - 'OLLAMA_BASE_URL=http://pt-playground-ollama:11434'
+      - 'OPENAI_API_BASE_URL=http://pt-playground-open-webui-pipelines:9099'
+      - 'OPENAI_API_KEY="0p3n-w3bu!"' # Default password
+      - 'WEBUI_AUTH=False'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
