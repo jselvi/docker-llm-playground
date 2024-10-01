@@ -4,16 +4,16 @@ services:
     container_name: pt-playground-ollama
     volumes:
       - ./data/ollama:/root/.ollama
-    environment:
-      # https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately
-      - 'OLLAMA_KEEP_ALIVE=-1'
+    #environment:
+    #  # https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately
+    #  - 'OLLAMA_KEEP_ALIVE=-1'
     restart: unless-stopped
 
   pt-playground-open-webui-pipelines:
     image: ghcr.io/open-webui/pipelines:main
     container_name: pt-playground-open-webui-pipelines
     volumes:
-      - ./pipelines:/app/PIPELINES_API_KEY
+      - ./pipelines:/app/pipelines
     environment:
       - 'PIPELINES_API_KEY="0p3n-w3bu!"'  # Default password
     restart: unless-stopped
